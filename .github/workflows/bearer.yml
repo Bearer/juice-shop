@@ -22,8 +22,6 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            // github does not support multiline outputs so report is encoded
-            const report = decodeURIComponent(`${{ steps.report.outputs.rule_breaches }}`);
             const passed = `${{ steps.report.outputs.exit_code }}` == "0";
-            if(!passed){ core.setFailed(report); }
+            if(!passed){ core.setFailed("Scan failed"); }
 

@@ -1,27 +1,32 @@
 name: Bearer
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - main
+      - master
 
 permissions:
   contents: read
+  # Add the security-events permission for Advanced Security
+  # security-events: write
 
 jobs:
-  policy_check:
+  rule_check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - name: Run Report
         id: report
-        uses: bearer/bearer-action@v1.0
-      - id: summary
-        name: Display Summary
-        uses: actions/github-script@v6
+        uses: bearer/bearer-action@v2
         with:
-          script: |
-            const passed = `${{ steps.report.outputs.exit_code }}` == "0";
-            if(!passed){ core.setFailed("Scan failed"); }
+          api-key: ${{ secrets.BEARER_TOKEN }}
+          # Include these two options for Advanced Security
+          # format: sarif
+          # output: results.sarif
+      
+      # Add a new step to upload the SARIF file for Advanced Security
+      # - name: Upload SARIF file
+      #   uses: github/codeql-action/upload-sarif@v2
+      #   with:
+      #     sarif_file: results.sarif
 

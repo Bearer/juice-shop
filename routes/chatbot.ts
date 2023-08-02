@@ -18,6 +18,7 @@ import { Bot } from 'juicy-chat-bot'
 import validateChatBot from '../lib/startup/validateChatBot'
 import * as security from '../lib/insecurity'
 import * as botUtils from '../lib/botUtils'
+import { OpenAIApi, Configuration } = require("openai")
 
 const challenges = require('../data/datacache').challenges
 
@@ -47,6 +48,23 @@ export async function initialize () {
 }
 
 void initialize()
+
+async function processQueryWithChatGPT (user: User, req: Request, res: Response, next: NextFunction) {
+  const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+  })
+  const openai = new OpenAIApi(configuration)
+
+  const completion = await openai.createCompletion({
+    model: "text-davinci-003",
+    prompt: `Hello world ${user.email}`,
+  })
+
+  res.status(200).json({
+    action: 'response',
+    body: completion.data.choices[0].text
+  })
+}
 
 async function processQuery (user: User, req: Request, res: Response, next: NextFunction) {
   if (!bot) {
